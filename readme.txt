@@ -88,11 +88,11 @@ logread -K <token> [-H] -R (-E <name> | -G <name>) <log>
 
 The following invocations are optional (for extra points):
 
-	logread -K <token> -T (-E <name> | -G <name>) <log>
-	logread -K <token> [-H] -I (-E <name> | -G <name>) [(-E <name> | -G <name>) ...] <log>
-	logread -K <token> [-H] -A -L <lower> -U <upper> <log>
-	logread -K <token> [-H] -B -L <lower1> -U <upper1> -L <lower2> -U <upper2> <log>
-	
+logread -K <token> -T (-E <name> | -G <name>) <log>
+logread -K <token> [-H] -I (-E <name> | -G <name>) [(-E <name> | -G <name>) ...] <log>
+logread -K <token> [-H] -A -L <lower> -U <upper> <log>
+logread -K <token> [-H] -B -L <lower1> -U <upper1> -L <lower2> -U <upper2> <log>
+
 Here is an example invocation
 
 	./logread -K secret -B -L 2 -U 5 -L 7 -U 9 path/to/log
