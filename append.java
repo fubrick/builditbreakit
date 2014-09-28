@@ -169,7 +169,7 @@ class LogAppender
 			return;
 		}
 
-		//check logname and verify password
+		//check if logname matches current log and verify password
 		//if no log exists and inLobby = true, then create new log
 	}
 	
