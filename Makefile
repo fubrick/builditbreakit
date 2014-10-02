@@ -33,3 +33,5 @@ poop: append.java
 #
 clean: 
 	$(RM) *.class
+	$(RM) log2
+	$(RM) log3
