@@ -61,14 +61,67 @@ class BatchReader
 	{	x.close();	}
 }
 
+class DataLoader
+{
+	private Scanner x;
+
+	public boolean openFile(String fileName)
+	{
+		try{
+			x = new Scanner(new File(fileName));
+		} catch(Exception e) {
+			System.out.println("Could not find log file");
+			return false;
+		}
+		return true;
+	}
+
+	public void loadData(LogFile log)
+	{
+		// read in file and add data to log
+	}
+
+	public void closeFile()
+	{	x.close();	}
+}
+
+class DataSaver
+{
+	Scanner sc = new Scanner(System.in);
+	private Formatter x;
+
+	public void openFile(String fileName)
+	{
+		try {
+			x = new Formatter(fileName);
+		} catch(Exception e) {
+			System.out.println("Could not open log");
+		}
+	}
+
+	public void addRecordsToLog(LogFile log)
+	{
+		// record data to log
+	}
+
+	public void closeFile()
+	{	x.close();	}
+}
+
 class LogAppender
 {
 	private String currentPassword = null;
 	private String encryptionKey = "blablad93j2wp0s1";
-	private String currentLog = null;
+	//private String currentLog = null;
+	private LogFile currentLog = null;
+
+	DataLoader reader = new DataLoader();
+	DataSaver saver = new DataSaver();
+
 
 	//make a hashtable of persons with name+log as the key
 	//private ArrayList<Person> currentPersons = new ArrayList<>();
+
 
 	public void validateLog(String log)
 	{
@@ -168,9 +221,36 @@ class LogAppender
 			System.out.println("invalid log name (must be alphanumeric)");
 			return;
 		}
+		/*
+		Valid states:	currentlog exists, inlobby = true
+						currentlog exists, inloggy = false
+						currentlog = null, inlobby = true
+		*/	
+		if (currentLog == null){
+			System.out.println("   !!must create new log: " + logName);
+			saver.openFile(logName);
+			saver.closeFile();
+			currentLog = new LogFile(logName);
+		}
+		else if (currentLog.getLogName().equals(logName)){
+			System.out.println("  we have current log");
+		} else if (currentLog.getLogName().equals(logName) == false) {
+			
+			//sdssave and encrypt current log
 
-		//check if logname matches current log and verify password
-		//if no log exists and inLobby = true, then create new log
+			System.out.println("   !!must create new log: " + logName);
+			saver.openFile(logName);
+			saver.closeFile();
+			currentLog = new LogFile(logName);
+		} else {
+			System.out.println("  could not process log entry. End of validateLog method");
+		}
+
+
+
+		//check pw against current log
+
+		//process data into log
 	}
 	
 }
@@ -213,14 +293,13 @@ class LogFile
 class Person
 {
 	public Person(String name, String type, int location, 
-		String movement, int time, String logName, String listOfRooms)
+		String movement, int time, String listOfRooms)
 	{
 		this.time = time;			//-T 1
 		this.movement = movement;	//-A
 		this.type = type;			//-E
 		this.name = name; 			//Joe
 		this.location = location;	//-R 1
-		this.logName = logName;		//log1
 		this.listOfRooms = listOfRooms;
 	}
 
@@ -245,17 +324,12 @@ class Person
 		listOfRooms.concat(", " + location);
 	}
 
-	public String toString()
-	{
-		return name + type + location + movement + time + logName + listOfRooms;
-	}
 
 	private int time;
 	private String movement;
 	private String type;
 	private String name;
 	private int location;
-	private String logName;
 	private String listOfRooms;
 }
 
