@@ -244,10 +244,9 @@ class LogAppender
 			currentLog = new LogFile(logName);
 		} else {
 			System.out.println("  could not process log entry. End of validateLog method");
+			return;
 		}
-
-
-
+		
 		//check pw against current log
 
 		//process data into log
