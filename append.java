@@ -1,5 +1,8 @@
 import java.util.*;
 import java.io.*;
+import java.security.Key;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 
 public class append
 {
@@ -126,7 +129,7 @@ class LogAppender
 	public void validateLog(String log)
 	{
 		String password, name, logName;
-		int time, room;
+		int time = -1, room = -1;
 		boolean arriving, guest, inLobby;
 
 		System.out.println(log);
@@ -221,32 +224,49 @@ class LogAppender
 			System.out.println("invalid log name (must be alphanumeric)");
 			return;
 		}
-		/*
-		Valid states:	currentlog exists, inlobby = true
-						currentlog exists, inloggy = false
-						currentlog = null, inlobby = true
-		*/	
+			
+		// get log
 		if (currentLog == null){
-			System.out.println("   !!must create new log: " + logName);
-			saver.openFile(logName);
-			saver.closeFile();
-			currentLog = new LogFile(logName);
+			//System.out.println("   !!must create new log: " + logName);
+			
+			if( reader.openFile(logName) == false) //attempt to find log failed
+			{
+				saver.openFile(logName);
+				saver.closeFile();
+				currentLog = new LogFile(logName, password);
+			}
+			else  //open existing log
+			{
+				currentLog = new LogFile(logName, password);
+				reader.loadData(currentLog);
+				reader.closeFile();
+			}
+			currentLog.addPerson(name, personType, room, movement, time);
+
 		}
 		else if (currentLog.getLogName().equals(logName)){
-			System.out.println("  we have current log");
+			//System.out.println("  we have current log");
+			if(currentLog.varifyPassword(password)) {
+				currentLog.addPerson(name, personType, room, movement, time);
+			}
+			else {
+				System.out.println("bad password!!!");
+				return;
+			}
+
 		} else if (currentLog.getLogName().equals(logName) == false) {
 			
-			//sdssave and encrypt current log
+			//save and encrypt current log
 
-			System.out.println("   !!must create new log: " + logName);
+			//System.out.println("   !!must create new log: " + logName);
 			saver.openFile(logName);
 			saver.closeFile();
-			currentLog = new LogFile(logName);
+			currentLog = new LogFile(logName, password);
 		} else {
 			System.out.println("  could not process log entry. End of validateLog method");
 			return;
 		}
-		
+
 		//check pw against current log
 
 		//process data into log
@@ -259,18 +279,27 @@ class LogFile
 	private String logName;
 	private int currentTime;
 	private String password;
-	private String key;
 
 	Hashtable<String, Person> log = new Hashtable<>();
 
-	public LogFile(String logName)
+	public LogFile(String logName, String password)
 	{
 		this.logName = logName;
+		this.password = password;
 	}
 
-	public void addPerson(Person newP)
+	public void addPerson(String name, String type, int location, String movement, int time)
 	{
-		log.put(newP.getName(), newP);
+			
+		if(log.containsKey(name)) {
+			Person p = log.get(name);
+			//p.updateMovement()
+		}
+		else {
+			Person newP = new Person(name, type, location, movement, time);
+			log.put(name, newP);
+			System.out.println(newP);
+		}
 	}
 
 	public String getLogName()
@@ -292,22 +321,22 @@ class LogFile
 class Person
 {
 	public Person(String name, String type, int location, 
-		String movement, int time, String listOfRooms)
+		String movement, int time)
 	{
 		this.time = time;			//-T 1
 		this.movement = movement;	//-A
 		this.type = type;			//-E
 		this.name = name; 			//Joe
 		this.location = location;	//-R 1
-		this.listOfRooms = listOfRooms;
+		listOfRooms = listOfRooms.concat(""+location);
 	}
 
 	public String getName()
 	{	return name;	}
 
-	public boolean hasLeftLastRoom()
+	public boolean canEnterNewRoom()
 	{
-		if (movement.equals("-L"))
+		if (movement.equals("-L") || location == -1 )
 			return true;
 		return false;
 	}
@@ -323,13 +352,19 @@ class Person
 		listOfRooms.concat(", " + location);
 	}
 
+	public String toString()
+	{
+		return "   Print student: "+name+" type:"+type+" location:"+location+
+			" movement:"+movement+" time:"+time+" list of rooms:"+listOfRooms;
+	}
+
 
 	private int time;
 	private String movement;
 	private String type;
 	private String name;
-	private int location;
-	private String listOfRooms;
+	private int location = -1;
+	private String listOfRooms = "";
 }
 
 
