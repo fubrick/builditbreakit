@@ -1,3 +1,6 @@
 *.class
 log2
 log3
+.DS_Store
+*.zip
+StrongAES.java

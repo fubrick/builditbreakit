@@ -210,7 +210,10 @@ class LogAppender
 		else if (personType.equals("-E"))
 			guest = false;
 		else
+		{
 			System.out.println("invalid personType command");
+			return;
+		}
 
 		// check name
 		name = check.nextToken();
