@@ -296,7 +296,8 @@ class LogFile
 			
 		if(log.containsKey(name)) {
 			Person p = log.get(name);
-			//p.updateMovement()
+			//p.updateMovement(int location, String movement, int time)
+			p.updateMovement(location, movement, time);
 		}
 		else {
 			Person newP = new Person(name, type, location, movement, time);
@@ -331,7 +332,6 @@ class Person
 		this.type = type;			//-E
 		this.name = name; 			//Joe
 		this.location = location;	//-R 1
-		listOfRooms = listOfRooms.concat(""+location);
 	}
 
 	public String getName()
@@ -339,7 +339,7 @@ class Person
 
 	public boolean canEnterNewRoom()
 	{
-		if (movement.equals("-L") || location == -1 )
+		if ( movement.equals("-L") || location == -1 )
 			return true;
 		return false;
 	}
@@ -347,18 +347,38 @@ class Person
 	public int checkTime()
 	{	return time;	}
 
-	public void updateMovement(int location, String movement, int time)
+	public void updateMovement(int newLocation, String newMove, int newTime)
 	{
-		this.location = location;
-		this.movement = movement;
-		this.time = time;
-		listOfRooms.concat(", " + location);
+		if (newMove.equals("-A")) {
+			if(location != -1 && location != newLocation && movement.equals("-L") && newTime > time)
+			{
+				location = newLocation;
+				movement = newMove;
+				time = newTime;
+			}
+			/*else if () {
+				
+			}*/
+			else
+				System.out.println("Invalid log update on arrival");
+		}
+		else if (newMove.equals("-L")) {
+			if (location == newLocation && movement.equals("-A") && newTime > time) {
+				location = newLocation;
+				movement = newMove;
+				time = newTime;
+			}
+			else
+				System.out.println("Invalid log update on leaving room!");
+		}
+		else
+			System.out.println("Invalid log entry: ");//maybe return false for a propper error message from caller
 	}
 
 	public String toString()
 	{
 		return "   Print student: "+name+" type:"+type+" location:"+location+
-			" movement:"+movement+" time:"+time+" list of rooms:"+listOfRooms;
+			" movement:"+movement+" time:"+time;
 	}
 
 
@@ -367,7 +387,6 @@ class Person
 	private String type;
 	private String name;
 	private int location = -1;
-	private String listOfRooms = "";
 }
 
 
